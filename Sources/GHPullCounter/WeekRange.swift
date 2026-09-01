@@ -14,34 +14,21 @@ struct WeekRange: Equatable {
         return WeekRange(start: interval.start, end: interval.end)
     }
 
-    private static let queryFormatter: ISO8601DateFormatter = {
-        let formatter = ISO8601DateFormatter()
-        formatter.formatOptions = [.withInternetDateTime, .withColonSeparatorInTimeZone]
-        return formatter
-    }()
-
-    private static let dayFormatter: DateFormatter = {
-        let formatter = DateFormatter()
-        formatter.setLocalizedDateFormatFromTemplate("MMMd")
-        return formatter
-    }()
-
-    private static let searchDayFormatter: DateFormatter = {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd"
-        return formatter
-    }()
-
-    var startSearchTerm: String { Self.queryFormatter.string(from: start) }
-    var endSearchTerm: String { Self.queryFormatter.string(from: end.addingTimeInterval(-0.001)) }
-    var startDaySearchTerm: String { Self.searchDayFormatter.string(from: start) }
+    var startSearchTerm: String { start.formatted(.iso8601) }
+    var endSearchTerm: String { end.addingTimeInterval(-0.001).formatted(.iso8601) }
+    var startDaySearchTerm: String { Self.daySearchTerm(start) }
     var lastDaySearchTerm: String {
-        let lastDay = Calendar.current.date(byAdding: .day, value: -1, to: end) ?? end
-        return Self.searchDayFormatter.string(from: lastDay)
+        Self.daySearchTerm(Calendar.current.date(byAdding: .day, value: -1, to: end) ?? end)
     }
 
     var title: String {
         let lastDay = Calendar.current.date(byAdding: .day, value: -1, to: end) ?? end
-        return "\(Self.dayFormatter.string(from: start)) – \(Self.dayFormatter.string(from: lastDay))"
+        return "\(start.formatted(.dateTime.day().month())) – \(lastDay.formatted(.dateTime.day().month()))"
+    }
+
+    private static func daySearchTerm(_ date: Date) -> String {
+        let components = Calendar.current.dateComponents([.year, .month, .day], from: date)
+        return String(format: "%04d-%02d-%02d",
+                      components.year ?? 0, components.month ?? 0, components.day ?? 0)
     }
 }

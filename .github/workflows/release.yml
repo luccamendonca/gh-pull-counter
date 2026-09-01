@@ -11,10 +11,10 @@ permissions:
 jobs:
   macos-arm64:
     name: Build (macOS Apple Silicon)
-    runs-on: macos-14
+    runs-on: macos-26
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Host architecture
         run: uname -m
@@ -35,7 +35,7 @@ jobs:
           shasum -a 256 "${ASSET_BASE}.zip" | tee "${ASSET_BASE}.zip.sha256"
 
       - name: Publish GitHub Release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           files: |
             gh-pull-counter-*-macos-arm64.zip
