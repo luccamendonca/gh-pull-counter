@@ -56,7 +56,9 @@ final class PRCounterModel: ObservableObject {
             while !Task.isCancelled {
                 await fetch()
                 // Wake up at the interval, or right after the week rolls over.
-                let rollover = max(1, weekRange.end.timeIntervalSinceNow + 2)
+                // Use `nextStart`, not `end`: between them the week is closed
+                // and there is nothing new to fetch.
+                let rollover = max(1, weekRange.nextStart.timeIntervalSinceNow + 2)
                 let nap = min(max(intervalSeconds, 5), rollover)
                 try? await Task.sleep(for: .seconds(nap))
             }
